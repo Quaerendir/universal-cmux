@@ -55,10 +55,21 @@ split right|down [COMMAND...]     # split the last pane of that workspace
 - Paste buffer (`prefix + ]`) and pane-number jump (`prefix + q`): not implemented in cmux-tui.
 - Mouse and vi copy-mode settings: no config keys documented.
 
-## Requirements
+## Requirements / platforms
 
-- Node.js 18+ (for the npm `cmux` package; Linux x64/arm64, macOS)
-- `cmux-stats.sh` CPU/RAM need Linux `/proc` (segment stays empty elsewhere)
+Everything targets **cmux-tui** (the terminal multiplexer), the same on every platform:
+
+- **Linux / VPS** (x64, arm64): Node.js 18+, then `npm install -g cmux` (done by `setup-cmux.sh`).
+- **macOS**: the same npm package, or the copy bundled in `cmux.app` (`Contents/Resources/bin/cmux-tui`). `setup-cmux.sh` finds it automatically.
+- `cmux-find.sh` resolves the binary: `$CMUX_BIN`, `cmux-tui`/`cmux` in PATH, npm global bin, the app bundle. It checks the binary really is the multiplexer, because inside cmux.app the `cmux` in PATH is the GUI's CLI, a different program.
+- `cmux-stats.sh`: CPU/RAM/load on Linux (`/proc`) and macOS (`top`, `vm_stat`); empty segment elsewhere.
+- `gpu-stats.sh`: NVIDIA, AMD, Intel, Raspberry Pi; silent on macOS and GPU-less hosts.
+- `bash` is needed by `setup-cmux.sh`, `cmux-workspaces.sh`, `gpu-stats.sh` (Alpine: `apk add bash`). The stats script is plain POSIX `sh`.
+- No Node.js (old or minimal systems)? Use [universal-tmux](https://github.com/Quaerendir/universal-tmux).
+
+## Extras
+
+`extras/cmux-app-workspaces.py` is macOS-only and optional: it builds workspaces in the **cmux.app GUI** (a different program from cmux-tui, with its own CLI) from the same `workspaces.conf`. Run it from a terminal inside the app; `--tmux` puts a tmux session (and its status bar) in each workspace.
 
 ## License
 

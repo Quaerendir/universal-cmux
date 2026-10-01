@@ -27,16 +27,17 @@ done
 shift $((OPTIND - 1))
 ACTION=${1:-up}
 
-command -v cmux >/dev/null || { echo "cmux not found (npm install -g cmux)" >&2; exit 1; }
+. "$(cd "$(dirname "$0")" && pwd)/cmux-find.sh"
+CMUX=$(find_cmux_tui) || { echo "cmux-tui not found (npm install -g cmux)" >&2; exit 1; }
 [ -r "$SPEC" ] || { echo "spec not found: $SPEC" >&2; exit 1; }
 
-c() { cmux --session "$SESSION" "$@"; }
+c() { "$CMUX" --session "$SESSION" "$@"; }
 # value of a "key   value" line from cmux text output
 field() { awk -v k="$1" '$1 == k { print $2; exit }'; }
 
 existing=""
 if [ "$ACTION" = up ]; then
-    cmux server ensure --session "$SESSION" >/dev/null || exit 1
+    "$CMUX" server ensure --session "$SESSION" >/dev/null || exit 1
     # columns: ID NAME INDEX FOCUSED SESSION (NAME may contain spaces)
     existing=$(c workspace list | sed -E '1d; s/^[^ ]+ +//; s/ +[0-9]+ +(true|false) +[^ ]+$//')
 fi

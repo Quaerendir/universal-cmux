@@ -7,21 +7,29 @@ set -e
 
 echo "=== cmux Universal Setup ==="
 
-# 1. Check / install cmux
-if ! command -v cmux &>/dev/null; then
-    if command -v npm &>/dev/null; then
+SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=cmux-find.sh
+. "$SRC/cmux-find.sh"
+
+# 1. Find / install cmux-tui (npm package `cmux`, or the copy bundled in macOS cmux.app)
+if ! CMUX=$(find_cmux_tui); then
+    if command -v npm >/dev/null 2>&1; then
         echo "Installing cmux via npm..."
-        npm install -g cmux
-    else
-        echo "ERROR: cmux not installed and npm not found"
-        echo "  Install Node.js 18+ first, then: npm install -g cmux"
-        exit 1
+        npm install -g cmux || echo "  (npm install failed — try a user prefix: npm config set prefix ~/.local)"
+        CMUX=$(find_cmux_tui) || CMUX=""
     fi
 fi
-echo "cmux: $(cmux --version 2>&1 | head -1)"
+if [ -z "${CMUX:-}" ]; then
+    echo "ERROR: cmux-tui not found and could not be installed." >&2
+    echo "  Install Node.js 18+ then: npm install -g cmux" >&2
+    echo "  (macOS: or install cmux.app, which bundles cmux-tui)" >&2
+    echo "  No Node here? Use universal-tmux instead: https://github.com/Quaerendir/universal-tmux" >&2
+    exit 1
+fi
+echo "cmux-tui: $CMUX ($("$CMUX" --version 2>&1 | head -1))"
+command -v bash >/dev/null || echo "WARNING: bash missing — cmux-workspaces.sh and gpu-stats.sh need it (Alpine: apk add bash)"
 
 CFG="${XDG_CONFIG_HOME:-$HOME/.config}/cmux"
-SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 mkdir -p "$CFG"
 
 # 2. Backup existing config
@@ -32,10 +40,10 @@ fi
 
 # 3. Copy files
 cp "$SRC/cmux-universal.json" "$CFG/cmux-tui.json"
-cp "$SRC/cmux-stats.sh" "$SRC/gpu-stats.sh" "$SRC/cmux-workspaces.sh" "$CFG/"
+cp "$SRC/cmux-stats.sh" "$SRC/gpu-stats.sh" "$SRC/cmux-workspaces.sh" "$SRC/cmux-find.sh" "$CFG/"
 chmod +x "$CFG/cmux-stats.sh" "$CFG/gpu-stats.sh" "$CFG/cmux-workspaces.sh"
 echo "Config  -> $CFG/cmux-tui.json"
-echo "Scripts -> $CFG/{cmux-stats,gpu-stats,cmux-workspaces}.sh"
+echo "Scripts -> $CFG/{cmux-stats,gpu-stats,cmux-workspaces,cmux-find}.sh"
 
 # 4. Workspace spec (never overwritten)
 if [ ! -f "$CFG/workspaces.conf" ]; then
@@ -44,15 +52,15 @@ if [ ! -f "$CFG/workspaces.conf" ]; then
 fi
 
 # 5. Reload a running default session, if any
-if cmux server status --session main 2>/dev/null | grep -q running; then
-    cmux server reload-config --session main >/dev/null 2>&1 && echo "Reloaded config in running session 'main'"
+if "$CMUX" server status --session main 2>/dev/null | grep -q running; then
+    "$CMUX" server reload-config --session main >/dev/null 2>&1 && echo "Reloaded config in running session 'main'"
 fi
 
 echo ""
 echo "=== DONE ==="
 echo ""
 echo "Next steps:"
-echo "  1. cmux                              — start / attach (session survives detaching)"
+echo "  1. $CMUX   — start / attach (session survives detaching)"
 echo "  2. $CFG/cmux-workspaces.sh up        — build workspaces from workspaces.conf"
 echo ""
 echo "Keybindings (prefix = C-a):"
