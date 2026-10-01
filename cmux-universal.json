@@ -1,0 +1,35 @@
+{
+  "keys": {
+    "prefix": "ctrl+a",
+    "split-down": ["-"],
+    "split-right": ["|"],
+    "zoom-pane": ["z", "shift+="],
+    "resize-grow": ["alt+="],
+    "resize-shrink": ["alt+-"],
+    "close-pane": ["x"],
+    "close-tab": ["X"],
+    "prev-screen": ["p", "alt+[", "ctrl+h"],
+    "next-screen": ["n", "alt+]", "ctrl+l"]
+  },
+  "theme": {
+    "chrome": "dark",
+    "status_bg": "#1c1c1c",
+    "status_fg": "#b2b2b2",
+    "border_active": "#87d7ff",
+    "border_inactive": "#444444"
+  },
+  "status_bar": {
+    "left": [
+      {"text": " {session} · {workspace} ", "fg": "#87d7ff"}
+    ],
+    "right_separator": " │ ",
+    "right": [
+      {"run": ["sh", "-c", "\"$HOME/.config/cmux/cmux-stats.sh\" cpu"],  "interval": 5,  "fg": "#00d7d7"},
+      {"run": ["sh", "-c", "\"$HOME/.config/cmux/cmux-stats.sh\" ram"],  "interval": 5,  "fg": "#d787d7"},
+      {"run": ["sh", "-c", "\"$HOME/.config/cmux/gpu-stats.sh\" 2>/dev/null"], "interval": 5, "fg": "#d7af00"},
+      {"run": ["sh", "-c", "\"$HOME/.config/cmux/cmux-stats.sh\" load"], "interval": 5,  "fg": "#87d787"},
+      {"run": ["date", "+%Y-%m-%d %H:%M"], "interval": 30, "fg": "#00afff"},
+      {"run": ["hostname", "-s"], "interval": 3600, "fg": "#87d7ff"}
+    ]
+  }
+}

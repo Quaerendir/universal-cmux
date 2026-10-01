@@ -1,0 +1,11 @@
+# Copy to ~/.config/cmux/workspaces.conf, then run: cmux-workspaces.sh up
+#
+# workspace NAME DIR [COMMAND...]
+# split right|down [COMMAND...]     (splits the last pane above it)
+
+workspace dev   ~/projects
+workspace dev2  ~/projects
+split right
+workspace dev3  ~/projects
+workspace adm   ~
+split down htop
