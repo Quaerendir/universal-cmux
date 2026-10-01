@@ -7,7 +7,7 @@
 #   list  show what the spec would create
 #
 # Spec format (one directive per line, # comments):
-#   workspace NAME DIR [COMMAND...]   new workspace; first pane cd's to DIR, runs COMMAND
+#   workspace NAME DIR [COMMAND...]   new workspace (quote NAME if it has spaces); first pane cd's to DIR, runs COMMAND
 #   split right|down [COMMAND...]     split the last pane of the current workspace
 #
 # Idempotent: workspaces whose name already exists in the session are skipped.
@@ -37,7 +37,8 @@ field() { awk -v k="$1" '$1 == k { print $2; exit }'; }
 existing=""
 if [ "$ACTION" = up ]; then
     cmux server ensure --session "$SESSION" >/dev/null || exit 1
-    existing=$(c workspace list | awk 'NR > 1 { print $2 }')
+    # columns: ID NAME INDEX FOCUSED SESSION (NAME may contain spaces)
+    existing=$(c workspace list | sed -E '1d; s/^[^ ]+ +//; s/ +[0-9]+ +(true|false) +[^ ]+$//')
 fi
 
 skip=0
@@ -45,7 +46,7 @@ pane="" term="" dir=""
 while IFS= read -r line || [ -n "$line" ]; do
     line="${line%%#*}"
     [ -n "${line//[[:space:]]/}" ] || continue
-    read -r -a w <<< "$line"
+    set -f; eval "w=($line)" 2>/dev/null || { set +f; echo "bad line: $line" >&2; continue; }; set +f  # quotes allowed in names
     case "${w[0]}" in
     workspace)
         name=${w[1]:?workspace needs a NAME}
