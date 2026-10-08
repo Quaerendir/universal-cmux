@@ -33,11 +33,11 @@ split right|down [COMMAND...]     # split the last pane of that workspace
 
 `cmux-workspaces.sh [-s session] [-f file] [up|list]` is idempotent: existing workspace names are skipped.
 
-## Keybindings (prefix `C-a`)
+## Keybindings (prefix `C-b`)
 
 | Key | Action |
 |---|---|
-| `prefix + -` / `\|` | split down / right |
+| `prefix + -` (or `"`) / `\|` (or `%`) | split down / right |
 | `prefix + z` / `+` | zoom pane |
 | `prefix + x` / `X` | close pane / tab |
 | `prefix + c` / `&` | new / close screen |
