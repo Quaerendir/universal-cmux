@@ -1,6 +1,6 @@
 # universal-cmux
 
-cmux counterpart of [universal-tmux](https://github.com/Quaerendir/universal-tmux): drop it on any machine and get the same prefix, split keys, dark theme and hardware-aware status bar in [cmux](https://github.com/manaflow-ai/cmux/tree/main/cmux-tui) (`npm install -g cmux`).
+cmux counterpart of [universal-tmux](https://github.com/Quaerendir/universal-tmux): drop it on any machine and get the same split keys (prefix is `C-b` instead of `C-a`, so it does not collide with a tmux running inside a cmux pane), dark theme and hardware-aware status bar in [cmux](https://github.com/manaflow-ai/cmux/tree/main/cmux-tui) (`npm install -g cmux`).
 
 ## What maps to what
 
